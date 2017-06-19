@@ -8,6 +8,13 @@ public class Utilities {
 	///DebugLog開關
 	public static bool IsDebug = true;
 
+	private static Dictionary<string, object> saveDict = new Dictionary<string, object>(); 
+
+	private static Dictionary<K, V> ToDictionary<K, V> (Hashtable table)
+	{
+		return table.Cast<DictionaryEntry>().ToDictionary(kvp =>(K)kvp.Key, kvp => (V)kvp.Value);
+	}
+
 	///<summary>DebugLog</summary>
 	///<remarks>建議使用這裡的DebugLog而不是用Unity的</remarks>
 	public static void DebugLog(object log)
@@ -16,6 +23,50 @@ public class Utilities {
 		{
 			Debug.Log(log);
 		}
+	}
+
+	///<summary>讀取存檔</summary>
+	///<remarks>帶入key值取得本機對應存檔</remarks>
+	public static object LoadSave(string key)
+	{
+		if(saveDict == null || saveDict.Count <= 0)
+		{
+			//@TODO 暫時使用Unity存檔 之後會串接steam存檔
+			saveDict = ToDictionary<string, object>((Hashtable)MiniJSON.jsonDecode(PlayerPrefs.GetString("Save")));
+		}
+
+		if(saveDict.ContainsKey(key))
+		{
+			return saveDict[key];
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	///<summary>存檔</summary>
+	///<remarks>帶入key值與value存檔</remarks>
+	public static void SaveKey(string key, object value)
+	{
+		if(saveDict == null || saveDict.Count <= 0)
+		{
+			saveDict = ToDictionary<string, object>((Hashtable)MiniJSON.jsonDecode(PlayerPrefs.GetString("Save")));
+		}
+
+		if(saveDict.ContainsKey(key))
+		{
+			saveDict[key] = value;
+		}
+		else
+		{
+			saveDict.Add(key, value);
+		}
+
+		string newSave = MiniJSON.jsonEncode(saveDict);
+
+		//@TODO 暫時使用Unity存檔 之後會串接steam存檔
+		PlayerPrefs.SetString("Save", newSave);
 	}
 
 	//Object轉換成Long
