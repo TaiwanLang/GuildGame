@@ -2,6 +2,8 @@
 using System;
 using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
+namespace LoadingControl{
 
 public class Utilities {
 
@@ -266,3 +268,4 @@ public class Utilities {
 	}
 }
 
+}
