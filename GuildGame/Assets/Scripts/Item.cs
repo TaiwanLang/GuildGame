@@ -18,6 +18,8 @@ namespace LoadingControl{
 		public static string key_chinese_desc = "zh-tw desc";
 		public static string key_english = "en";
 		public static string key_english_desc = "en desc";
+		public static string key_picture = "picturename";
+		public static string key_value = "value";
 
 		//addition sheet
 		public static string key_addition_param1 = "param1";
@@ -32,11 +34,15 @@ namespace LoadingControl{
 		//weapon sheet
 		public static string key_weapon_attacknumber = "atk";
 		public static string key_weapon_type = "type";
+		public static string key_weapon_effect1 = "effect1";
+		public static string key_weapon_effect1count = "effect1count";
+		public static string key_weapon_effect2 = "effect2";
+		public static string key_weapon_effect2count = "effect2count";
+		public static string key_weapon_career = "usablecareer";
 
 		//material sheet
 		public static string key_item_rate = "rate";
 		public static string key_item_droprate = "droprate";
-		public static string key_item_value = "value";
 
 		public static List<MaterialInfo> materialinfo_list;
 		public static List<WeaponInfo> weaponinfo_list;
@@ -106,6 +112,7 @@ namespace LoadingControl{
 
 			return resultItem;
 		}
+
 		public static Dictionary<string, string> GetDictWithResultItem (string parent, string resultItem)
 		{
 			if (itemTable != null && itemTable.Count > 0) {
@@ -120,14 +127,15 @@ namespace LoadingControl{
 				componentItem.Add (key, (string)childTable [key]);
 				componentItem.Add (key_item_rate, (string)childTable [key_item_rate]);
 				componentItem.Add (key_item_droprate, (string)childTable [key_item_droprate]);				
-				componentItem.Add (key_item_value, (string)childTable [key_item_value]);
+				componentItem.Add (key_value, (string)childTable [key_value]);
 
 				return componentItem;
 			} else {
 				return null;
 			}
 		}
-		public static void GetDicForAddition(){
+
+		public static void SetInitListForAddition(){
 			Utilities.DebugLog ("addition init called");
 			if (itemTable != null && itemTable.Count > 0) {
 				if (!itemTable.ContainsKey (table_addition)) {
@@ -135,35 +143,167 @@ namespace LoadingControl{
 					return;
 				}
 				Utilities.DebugLog ("get parent table");
-
 				Hashtable parentTable = (Hashtable)itemTable [table_addition];
-				foreach (Hashtable childtable in parentTable) {
+
+				foreach (string stringkey in parentTable.Keys){
 					//把每一行抓出來
-					Hashtable currenttable = (Hashtable)childtable;
+					Hashtable currenttable = (Hashtable)parentTable[stringkey];
 					AdditionInfo current_addition = new AdditionInfo();
 					int count = 0;
-
-					current_addition.itemkey = (string)currenttable [key];
+					current_addition.itemkey = stringkey;
 					current_addition.param = new Dictionary<string, int> ();
 
 					int.TryParse ((string)currenttable [key_addition_param1count] ,out count);
 					current_addition.param.Add((string)currenttable [key_addition_param1],count);
-					if (!(currenttable [key_addition_param2]).Equals ("")) {
+					string currentparam = (string)currenttable [key_addition_param2];
+					if (currentparam != null && currentparam.CompareTo("") != 0) {
 						int.TryParse ((string)currenttable [key_addition_param2count], out count);
 						current_addition.param.Add((string)currenttable [key_addition_param2],count);
-						Utilities.DebugLog ("now is " + count);
 					}
 
+					currentparam = (string)currenttable [key_addition_param3];
+					if (currentparam != null && currentparam.CompareTo("") != 0) {
+						int.TryParse ((string)currenttable [key_addition_param3count], out count);
+						current_addition.param.Add((string)currenttable [key_addition_param3],count);
+					}
+					currentparam = (string)currenttable [key_addition_param4];
+					if (currentparam != null && currentparam.CompareTo("") != 0) {
+						int.TryParse ((string)currenttable [key_addition_param4count], out count);
+						current_addition.param.Add((string)currenttable [key_addition_param4],count);
+					}
 					additioninfo_list.Add (current_addition);
-					Utilities.DebugLog (current_addition.itemkey);
 				}
 			}
+		}
+		public static AdditionInfo FindAdditionByKey(string addtionkey){
+			if (additioninfo_list == null||additioninfo_list.Count == 0)
+				return null;
+			AdditionInfo raddition = null;
+			foreach (AdditionInfo addition in additioninfo_list) {
+				if (addition.itemkey.CompareTo (addtionkey) == 0) {
+					raddition = addition;
+					break;
+				}
+			}
+			return raddition;
+		}
+		public static void SetInitListForWeapon(){
+			if (itemTable != null && itemTable.Count > 0) {
+				if (!itemTable.ContainsKey (table_addition)) {
+					Utilities.DebugLog ("returned");
+					return;
+				}
+				Hashtable parentTable = (Hashtable)itemTable [table_weapon];
+
+				foreach (string stringkey in parentTable.Keys){
+					//把每一行抓出來
+					Hashtable currenttable = (Hashtable)parentTable[stringkey];
+					WeaponInfo current_weapon = new WeaponInfo();
+					int count = 0;
+					current_weapon.weaponkey = stringkey;
+					int.TryParse((string)currenttable[key_weapon_attacknumber],out count);
+					weaponType weapontype = weaponType.cannotread;
+					switch (currenttable [key_weapon_type].ToString()) {
+					case"weapon":
+						weapontype = weaponType.weapon;
+						break;
+					case"armor":
+						weapontype = weaponType.armor;
+						break;
+					case"item":
+						weapontype = weaponType.item;
+						break;
+					default:
+						break;
+					}
+					current_weapon.type = weapontype;
+					current_weapon.tw = (string)currenttable [key_chinese];
+					current_weapon.tw_desc = (string)currenttable [key_chinese_desc];
+					current_weapon.en = (string)currenttable [key_english];
+					current_weapon.en_desc = (string)currenttable [key_english_desc];
+					current_weapon.effect1 = (string)currenttable [key_weapon_effect1];
+					current_weapon.effect1_count = parseInt((string)currenttable [key_weapon_effect1count]);
+					current_weapon.effect2 = (string)currenttable [key_weapon_effect2];
+					current_weapon.effect2_count = parseInt((string)currenttable [key_weapon_effect2count]);
+					current_weapon.picture_name = (string)currenttable [key_picture];
+					current_weapon.price_value = parseInt((string)currenttable [key_value]);
+					career career=career.cannotread;
+					switch (currenttable [key_weapon_career].ToString()) {
+					case"all":
+						career = career.all;
+						break;
+					case"":
+						break;
+					default:
+						break;
+					}
+					current_weapon.usablecareer = career;
+					Utilities.DebugLog ("career is "+current_weapon.usablecareer);
+					weaponinfo_list.Add (current_weapon);
+				}
+			}
+		}
+		public static WeaponInfo FindWeaponInfoByKey(string weaponkey){
+			if (weaponinfo_list == null||weaponinfo_list.Count == 0)
+				return null;
+			WeaponInfo rweapon = null;
+			foreach (WeaponInfo weapon in weaponinfo_list) {
+				if (weapon.weaponkey.CompareTo (weaponkey) == 0) {
+					rweapon = weapon;
+					break;
+				}
+			}
+			return rweapon;
+		}
+		public static void SetInitListForMaterial(){
+			if (itemTable != null && itemTable.Count > 0) {
+				if (!itemTable.ContainsKey (table_addition)) {
+					Utilities.DebugLog ("returned");
+					return;
+				}
+				Hashtable parentTable = (Hashtable)itemTable [table_material];
+
+				foreach (string stringkey in parentTable.Keys){
+					//把每一行抓出來
+					Hashtable currenttable = (Hashtable)parentTable[stringkey];
+					MaterialInfo current_material = new MaterialInfo();
+					current_material.itemkey = stringkey;
+					current_material.rate = parseInt((string)currenttable[key_item_rate]);
+					current_material.droprate = parseInt((string)currenttable[key_item_droprate]);
+					current_material.price_value = parseInt((string)currenttable [key_value]);
+					current_material.en = (string)currenttable[key_english];
+					current_material.tw = (string)currenttable [key_chinese];
+					current_material.en_desc = (string)currenttable [key_english_desc];
+					current_material.tw_desc = (string)currenttable [key_chinese_desc];
+					current_material.picture_name = (string)currenttable [key_picture];
+					materialinfo_list.Add (current_material);
+				}
+			}
+		}
+		public static MaterialInfo FindMaterialByKey(string materialkey){
+			if (materialinfo_list == null||materialinfo_list.Count == 0)
+				return null;
+			MaterialInfo rmaterial = null;
+			foreach (MaterialInfo material in materialinfo_list) {
+				if (material.itemkey.CompareTo (materialkey) == 0) {
+					rmaterial = material;
+					break;
+				}
+			}
+			return rmaterial;
+		}
+		private static int parseInt(string parseingitem){
+			int count = 0;
+
+			int.TryParse (parseingitem, out count);
+
+			return count;
 		}
 	}
 }
 
-public enum weaponType{weapon,armor,item}
-public enum career{all}
+public enum weaponType{weapon,armor,item,cannotread}  //裝備類型
+public enum career{all,cannotread} //職業
 
 public class AdditionInfo{
 	public string itemkey;
@@ -183,13 +323,12 @@ public class MaterialInfo{
 	public string Name;
 	public int unlock_lv;
 	public bool unlocked;
+	public string picture_name;
 }
 public class WeaponInfo{
 	public string weaponkey;
 	public weaponType type;
-	public int atk;
 	public int count;
-	public string Name;
 	public string tw;
 	public string tw_desc;
 	public string en;
@@ -201,5 +340,6 @@ public class WeaponInfo{
 	public career usablecareer;
 	public int price_value;
 	public bool unlocked;
-	public int unlock_level;
+	public int unlock_level;	
+	public string picture_name;
 }
