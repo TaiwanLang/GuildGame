@@ -9,12 +9,15 @@ namespace LoadingControl{
 
 		private const string LANGUAGE_PATH = "items";
 
+		public static string table_weapon = "weapon";
+		public static string table_material = "item";
+		public static string table_addition = "addition";
+
 		public static string key = "key";
 		public static string key_chinese = "zh-tw";
 		public static string key_chinese_desc = "zh-tw desc";
 		public static string key_english = "en";
 		public static string key_english_desc = "en desc";
-		public static string key_unlock_level = "unlock_lv";
 
 		//addition sheet
 		public static string key_addition_param1 = "param1";
@@ -29,11 +32,15 @@ namespace LoadingControl{
 		//weapon sheet
 		public static string key_weapon_attacknumber = "atk";
 		public static string key_weapon_type = "type";
-		public static string 
 
 		//material sheet
-		public static string Type_Materials = "Materials";
-		public static string Type_Weapon = "Weapon";
+		public static string key_item_rate = "rate";
+		public static string key_item_droprate = "droprate";
+		public static string key_item_value = "value";
+
+		public static List<MaterialInfo> materialinfo_list;
+		public static List<WeaponInfo> weaponinfo_list;
+		public static List<AdditionInfo> additioninfo_list;
 
 		private static Dictionary<string, object> itemTable;
 
@@ -44,6 +51,9 @@ namespace LoadingControl{
 
 		public static void LoadItem()
 		{
+			materialinfo_list = new List<MaterialInfo> ();
+			weaponinfo_list = new List<WeaponInfo> ();
+			additioninfo_list = new List<AdditionInfo> ();
 			itemTable = new Dictionary<string, object>();
 
 			itemTable = ToDictionary<string, object>((Hashtable)MiniJSON.jsonDecode(((TextAsset)Resources.Load(LANGUAGE_PATH)).text));
@@ -72,7 +82,7 @@ namespace LoadingControl{
 			else return null;
 		}
 
-		public static string SearchResultItem(string parent, string item_1, string item_2, string item_3)
+		public static string SearchResultItem(string parent, string item_1, string item_2, string item_3,string item_4)
 		{
 			bool foundItem = false;
 			string resultItem = "";
@@ -82,9 +92,10 @@ namespace LoadingControl{
 				foreach(string key in parentTable.Keys)
 				{
 					Hashtable childTable = (Hashtable)parentTable[key];
-					foundItem = ((string)childTable[weapon_key_param1] == item_1 
-						&& (string)childTable[weapon_key_param2] == item_2 
-						&& (string)childTable[weapon_key_param3] == item_3);
+					foundItem = ((string)childTable[key_addition_param1] == item_1 
+						&& (string)childTable[key_addition_param2] == item_2 
+						&& (string)childTable[key_addition_param3] == item_3
+						&& (string)childTable[key_addition_param4] == item_4);
 					if(foundItem)
 					{
 						resultItem = key;
@@ -106,17 +117,46 @@ namespace LoadingControl{
 				Hashtable childTable = (Hashtable)parentTable [resultItem];
 
 				Dictionary<string, string> componentItem = new Dictionary<string, string> ();
-				componentItem.Add (key_param1, (string)childTable [weapon_key_param1]);
-				componentItem.Add (key_param1count, (string)childTable [weapon_key_param1count]);
-				componentItem.Add (key_param2, (string)childTable [weapon_key_param2]);				
-				componentItem.Add (key_param2count, (string)childTable [weapon_key_param2count]);
-				componentItem.Add (key_param3, (string)childTable [weapon_key_param3]);
-				componentItem.Add (key_param3count, (string)childTable [weapon_key_param3count]);
-				componentItem.Add (key_param4, (string)childTable [weapon_key_param4]);
-				componentItem.Add (key_param4count, (string)childTable [weapon_key_param4count]);
+				componentItem.Add (key, (string)childTable [key]);
+				componentItem.Add (key_item_rate, (string)childTable [key_item_rate]);
+				componentItem.Add (key_item_droprate, (string)childTable [key_item_droprate]);				
+				componentItem.Add (key_item_value, (string)childTable [key_item_value]);
+
 				return componentItem;
 			} else {
 				return null;
+			}
+		}
+		public static void GetDicForAddition(){
+			Utilities.DebugLog ("addition init called");
+			if (itemTable != null && itemTable.Count > 0) {
+				if (!itemTable.ContainsKey (table_addition)) {
+					Utilities.DebugLog ("returned");
+					return;
+				}
+				Utilities.DebugLog ("get parent table");
+
+				Hashtable parentTable = (Hashtable)itemTable [table_addition];
+				foreach (Hashtable childtable in parentTable) {
+					//把每一行抓出來
+					Hashtable currenttable = (Hashtable)childtable;
+					AdditionInfo current_addition = new AdditionInfo();
+					int count = 0;
+
+					current_addition.itemkey = (string)currenttable [key];
+					current_addition.param = new Dictionary<string, int> ();
+
+					int.TryParse ((string)currenttable [key_addition_param1count] ,out count);
+					current_addition.param.Add((string)currenttable [key_addition_param1],count);
+					if (!(currenttable [key_addition_param2]).Equals ("")) {
+						int.TryParse ((string)currenttable [key_addition_param2count], out count);
+						current_addition.param.Add((string)currenttable [key_addition_param2],count);
+						Utilities.DebugLog ("now is " + count);
+					}
+
+					additioninfo_list.Add (current_addition);
+					Utilities.DebugLog (current_addition.itemkey);
+				}
 			}
 		}
 	}
