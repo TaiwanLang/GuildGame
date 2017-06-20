@@ -17,7 +17,7 @@ using System.Collections.Generic;
 /// JSON uses Arrays and Objects. These correspond here to the datatypes ArrayList and Hashtable.
 /// All numbers are parsed to doubles.
 /// </summary>
-
+namespace LoadingControl{
 public class MiniJSON
 {
 	private const int TOKEN_NONE = 0;
@@ -737,3 +737,4 @@ public static class MiniJsonExtensions
 #endregion
 
 
+}
