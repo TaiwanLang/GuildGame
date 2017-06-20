@@ -9,40 +9,40 @@ namespace LoadingControl{
 
 		private const string LANGUAGE_PATH = "items";
 
-		public static string table_weapon = "weapon";
-		public static string table_material = "item";
-		public static string table_addition = "addition";
+		public const string table_weapon = "weapon";
+		public const string table_material = "item";
+		public const string table_addition = "addition";
 
-		public static string key = "key";
-		public static string key_chinese = "zh-tw";
-		public static string key_chinese_desc = "zh-tw desc";
-		public static string key_english = "en";
-		public static string key_english_desc = "en desc";
-		public static string key_picture = "picturename";
-		public static string key_value = "value";
+		public const string key = "key";
+		public const string key_chinese = "zh-tw";
+		public const string key_chinese_desc = "zh-tw desc";
+		public const string key_english = "en";
+		public const string key_english_desc = "en desc";
+		public const string key_picture = "picturename";
+		public const string key_value = "value";
 
 		//addition sheet
-		public static string key_addition_param1 = "param1";
-		public static string key_addition_param1count = "param1count";
-		public static string key_addition_param2 ="param2";
-		public static string key_addition_param2count = "param2count";
-		public static string key_addition_param3 = "param3";
-		public static string key_addition_param3count = "param3count";
-		public static string key_addition_param4 = "param4";
-		public static string key_addition_param4count = "param4count";
+		public const string key_addition_param1 = "param1";
+		public const string key_addition_param1count = "param1count";
+		public const string key_addition_param2 ="param2";
+		public const string key_addition_param2count = "param2count";
+		public const string key_addition_param3 = "param3";
+		public const string key_addition_param3count = "param3count";
+		public const string key_addition_param4 = "param4";
+		public const string key_addition_param4count = "param4count";
 
 		//weapon sheet
-		public static string key_weapon_attacknumber = "atk";
-		public static string key_weapon_type = "type";
-		public static string key_weapon_effect1 = "effect1";
-		public static string key_weapon_effect1count = "effect1count";
-		public static string key_weapon_effect2 = "effect2";
-		public static string key_weapon_effect2count = "effect2count";
-		public static string key_weapon_career = "usablecareer";
+		public const string key_weapon_attacknumber = "atk";
+		public const string key_weapon_type = "type";
+		public const string key_weapon_effect1 = "effect1";
+		public const string key_weapon_effect1count = "effect1count";
+		public const string key_weapon_effect2 = "effect2";
+		public const string key_weapon_effect2count = "effect2count";
+		public const string key_weapon_career = "usablecareer";
 
 		//material sheet
-		public static string key_item_rate = "rate";
-		public static string key_item_droprate = "droprate";
+		public const string key_item_rate = "rate";
+		public const string key_item_droprate = "droprate";
 
 		public static List<MaterialInfo> materialinfo_list;
 		public static List<WeaponInfo> weaponinfo_list;
@@ -61,7 +61,6 @@ namespace LoadingControl{
 			weaponinfo_list = new List<WeaponInfo> ();
 			additioninfo_list = new List<AdditionInfo> ();
 			itemTable = new Dictionary<string, object>();
-
 			itemTable = ToDictionary<string, object>((Hashtable)MiniJSON.jsonDecode(((TextAsset)Resources.Load(LANGUAGE_PATH)).text));
 		}
 
@@ -88,88 +87,33 @@ namespace LoadingControl{
 			else return null;
 		}
 
-		public static string SearchResultItem(string parent, string item_1, string item_2, string item_3,string item_4)
-		{
-			bool foundItem = false;
-			string resultItem = "";
-			if(itemTable != null && itemTable.Count > 0)
-			{
-				Hashtable parentTable = (Hashtable)itemTable[parent];
-				foreach(string key in parentTable.Keys)
-				{
-					Hashtable childTable = (Hashtable)parentTable[key];
-					foundItem = ((string)childTable[key_addition_param1] == item_1 
-						&& (string)childTable[key_addition_param2] == item_2 
-						&& (string)childTable[key_addition_param3] == item_3
-						&& (string)childTable[key_addition_param4] == item_4);
-					if(foundItem)
-					{
-						resultItem = key;
-						break;
-					}
-				}
-			}
-
-			return resultItem;
-		}
-
-		public static Dictionary<string, string> GetDictWithResultItem (string parent, string resultItem)
-		{
-			if (itemTable != null && itemTable.Count > 0) {
-				if (!itemTable.ContainsKey (parent))
-					return null;
-				Hashtable parentTable = (Hashtable)itemTable [parent];
-				if (!parentTable.ContainsKey (resultItem))
-					return null;
-				Hashtable childTable = (Hashtable)parentTable [resultItem];
-
-				Dictionary<string, string> componentItem = new Dictionary<string, string> ();
-				componentItem.Add (key, (string)childTable [key]);
-				componentItem.Add (key_item_rate, (string)childTable [key_item_rate]);
-				componentItem.Add (key_item_droprate, (string)childTable [key_item_droprate]);				
-				componentItem.Add (key_value, (string)childTable [key_value]);
-
-				return componentItem;
-			} else {
-				return null;
-			}
-		}
 
 		public static void SetInitListForAddition(){
-			Utilities.DebugLog ("addition init called");
 			if (itemTable != null && itemTable.Count > 0) {
 				if (!itemTable.ContainsKey (table_addition)) {
-					Utilities.DebugLog ("returned");
 					return;
 				}
-				Utilities.DebugLog ("get parent table");
 				Hashtable parentTable = (Hashtable)itemTable [table_addition];
 
 				foreach (string stringkey in parentTable.Keys){
 					//把每一行抓出來
 					Hashtable currenttable = (Hashtable)parentTable[stringkey];
 					AdditionInfo current_addition = new AdditionInfo();
-					int count = 0;
 					current_addition.itemkey = stringkey;
 					current_addition.param = new Dictionary<string, int> ();
-
-					int.TryParse ((string)currenttable [key_addition_param1count] ,out count);
-					current_addition.param.Add((string)currenttable [key_addition_param1],count);
-					string currentparam = (string)currenttable [key_addition_param2];
+					current_addition.param.Add( Utilities.LoadString(currenttable [key_addition_param1],"")
+						,Utilities.LoadInt(currenttable [key_addition_param1count] ,0));
+					string currentparam =  Utilities.LoadString(currenttable [key_addition_param2],"");
 					if (currentparam != null && currentparam.CompareTo("") != 0) {
-						int.TryParse ((string)currenttable [key_addition_param2count], out count);
-						current_addition.param.Add((string)currenttable [key_addition_param2],count);
+						current_addition.param.Add(currentparam,Utilities.LoadInt(currenttable [key_addition_param2count] ,0));
 					}
-
-					currentparam = (string)currenttable [key_addition_param3];
+					currentparam = Utilities.LoadString(currenttable [key_addition_param3],"");
 					if (currentparam != null && currentparam.CompareTo("") != 0) {
-						int.TryParse ((string)currenttable [key_addition_param3count], out count);
-						current_addition.param.Add((string)currenttable [key_addition_param3],count);
+						current_addition.param.Add(currentparam,Utilities.LoadInt(currenttable [key_addition_param3count] ,0));
 					}
-					currentparam = (string)currenttable [key_addition_param4];
+					currentparam = Utilities.LoadString(currenttable [key_addition_param4],"");
 					if (currentparam != null && currentparam.CompareTo("") != 0) {
-						int.TryParse ((string)currenttable [key_addition_param4count], out count);
-						current_addition.param.Add((string)currenttable [key_addition_param4],count);
+						current_addition.param.Add(currentparam,Utilities.LoadInt(currenttable [key_addition_param4count] ,0));
 					}
 					additioninfo_list.Add (current_addition);
 				}
@@ -190,7 +134,6 @@ namespace LoadingControl{
 		public static void SetInitListForWeapon(){
 			if (itemTable != null && itemTable.Count > 0) {
 				if (!itemTable.ContainsKey (table_addition)) {
-					Utilities.DebugLog ("returned");
 					return;
 				}
 				Hashtable parentTable = (Hashtable)itemTable [table_weapon];
@@ -201,7 +144,6 @@ namespace LoadingControl{
 					WeaponInfo current_weapon = new WeaponInfo();
 					int count = 0;
 					current_weapon.weaponkey = stringkey;
-					int.TryParse((string)currenttable[key_weapon_attacknumber],out count);
 					weaponType weapontype = weaponType.cannotread;
 					switch (currenttable [key_weapon_type].ToString()) {
 					case"weapon":
@@ -217,16 +159,16 @@ namespace LoadingControl{
 						break;
 					}
 					current_weapon.type = weapontype;
-					current_weapon.tw = (string)currenttable [key_chinese];
-					current_weapon.tw_desc = (string)currenttable [key_chinese_desc];
-					current_weapon.en = (string)currenttable [key_english];
-					current_weapon.en_desc = (string)currenttable [key_english_desc];
-					current_weapon.effect1 = (string)currenttable [key_weapon_effect1];
-					current_weapon.effect1_count = parseInt((string)currenttable [key_weapon_effect1count]);
-					current_weapon.effect2 = (string)currenttable [key_weapon_effect2];
-					current_weapon.effect2_count = parseInt((string)currenttable [key_weapon_effect2count]);
-					current_weapon.picture_name = (string)currenttable [key_picture];
-					current_weapon.price_value = parseInt((string)currenttable [key_value]);
+					current_weapon.tw = Utilities.LoadString(currenttable [key_chinese],"");
+					current_weapon.tw_desc = Utilities.LoadString(currenttable [key_chinese_desc],"");
+					current_weapon.en = Utilities.LoadString(currenttable [key_english],"");
+					current_weapon.en_desc = Utilities.LoadString(currenttable [key_english_desc],"");
+					current_weapon.effect1 = Utilities.LoadString(currenttable [key_weapon_effect1],"");
+					current_weapon.effect1_count = Utilities.LoadInt(currenttable [key_weapon_effect1count],0);
+					current_weapon.effect2 = Utilities.LoadString(currenttable [key_weapon_effect2],"");
+					current_weapon.effect2_count = Utilities.LoadInt(currenttable [key_weapon_effect2count],0);
+					current_weapon.picture_name = Utilities.LoadString(currenttable [key_picture],"");
+					current_weapon.price_value = Utilities.LoadInt(currenttable [key_value],0);
 					career career=career.cannotread;
 					switch (currenttable [key_weapon_career].ToString()) {
 					case"all":
@@ -258,7 +200,6 @@ namespace LoadingControl{
 		public static void SetInitListForMaterial(){
 			if (itemTable != null && itemTable.Count > 0) {
 				if (!itemTable.ContainsKey (table_addition)) {
-					Utilities.DebugLog ("returned");
 					return;
 				}
 				Hashtable parentTable = (Hashtable)itemTable [table_material];
@@ -268,14 +209,14 @@ namespace LoadingControl{
 					Hashtable currenttable = (Hashtable)parentTable[stringkey];
 					MaterialInfo current_material = new MaterialInfo();
 					current_material.itemkey = stringkey;
-					current_material.rate = parseInt((string)currenttable[key_item_rate]);
-					current_material.droprate = parseInt((string)currenttable[key_item_droprate]);
-					current_material.price_value = parseInt((string)currenttable [key_value]);
-					current_material.en = (string)currenttable[key_english];
-					current_material.tw = (string)currenttable [key_chinese];
-					current_material.en_desc = (string)currenttable [key_english_desc];
-					current_material.tw_desc = (string)currenttable [key_chinese_desc];
-					current_material.picture_name = (string)currenttable [key_picture];
+					current_material.rate = Utilities.LoadInt (currenttable[key_item_rate],0);
+					current_material.droprate = Utilities.LoadInt (currenttable[key_item_droprate],0);
+					current_material.price_value = Utilities.LoadInt (currenttable[key_value],0);
+					current_material.en = Utilities.LoadString(currenttable[key_english],"");
+					current_material.tw = Utilities.LoadString(currenttable [key_chinese],"");
+					current_material.en_desc = Utilities.LoadString(currenttable [key_english_desc],"");
+					current_material.tw_desc = Utilities.LoadString(currenttable [key_chinese_desc],"");
+					current_material.picture_name = Utilities.LoadString(currenttable [key_picture],"");
 					materialinfo_list.Add (current_material);
 				}
 			}
@@ -292,13 +233,7 @@ namespace LoadingControl{
 			}
 			return rmaterial;
 		}
-		private static int parseInt(string parseingitem){
-			int count = 0;
 
-			int.TryParse (parseingitem, out count);
-
-			return count;
-		}
 	}
 }
 
