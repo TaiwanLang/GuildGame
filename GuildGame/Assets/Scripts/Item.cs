@@ -22,30 +22,29 @@ namespace LoadingControl{
 		public const string key_value = "value";
 
 		//addition sheet
-		public const string key_addition_param1 = "param1";
-		public const string key_addition_param1count = "param1count";
-		public const string key_addition_param2 ="param2";
-		public const string key_addition_param2count = "param2count";
-		public const string key_addition_param3 = "param3";
-		public const string key_addition_param3count = "param3count";
-		public const string key_addition_param4 = "param4";
-		public const string key_addition_param4count = "param4count";
+		public const string key_addition_param1 = "param1";				//素材1
+		public const string key_addition_param1count = "param1count";	//素材1需要的個數
+		public const string key_addition_param2 ="param2";				//素材2
+		public const string key_addition_param2count = "param2count";	//素材2需要的個數
+		public const string key_addition_param3 = "param3";				//素材3
+		public const string key_addition_param3count = "param3count";	//素材3需要的個數
+		public const string key_addition_param4 = "param4";				//素材4
+		public const string key_addition_param4count = "param4count";	//素材4需要的個數
 
-		//weapon sheet
-		public const string key_weapon_attacknumber = "atk";
-		public const string key_weapon_type = "type";
-		public const string key_weapon_effect1 = "effect1";
-		public const string key_weapon_effect1count = "effect1count";
-		public const string key_weapon_effect2 = "effect2";
-		public const string key_weapon_effect2count = "effect2count";
-		public const string key_weapon_career = "usablecareer";
+		//equipment sheet
+		public const string key_weapon_type = "type";					//裝備種類
+		public const string key_weapon_effect1 = "effect1";				//特效1
+		public const string key_weapon_effect1count = "effect1count";	//特效1的數值
+		public const string key_weapon_effect2 = "effect2";				//特效2
+		public const string key_weapon_effect2count = "effect2count";	//特效2的數值
+		public const string key_weapon_career = "usablecareer";			//可使用職業
 
 		//material sheet
-		public const string key_item_rate = "rate";
-		public const string key_item_droprate = "droprate";
+		public const string key_item_rate = "rate";//稀有度
+		public const string key_item_droprate = "droprate";//掉寶率
 
 		public static List<MaterialInfo> materialinfo_list;
-		public static List<WeaponInfo> weaponinfo_list;
+		public static List<EquipmentInfo> equipmentinfo_list;
 		public static List<AdditionInfo> additioninfo_list;
 
 		private static Dictionary<string, object> itemTable;
@@ -58,7 +57,7 @@ namespace LoadingControl{
 		public static void LoadItem()
 		{
 			materialinfo_list = new List<MaterialInfo> ();
-			weaponinfo_list = new List<WeaponInfo> ();
+			equipmentinfo_list = new List<EquipmentInfo> ();
 			additioninfo_list = new List<AdditionInfo> ();
 			itemTable = new Dictionary<string, object>();
 			itemTable = ToDictionary<string, object>((Hashtable)MiniJSON.jsonDecode(((TextAsset)Resources.Load(LANGUAGE_PATH)).text));
@@ -141,34 +140,34 @@ namespace LoadingControl{
 				foreach (string stringkey in parentTable.Keys){
 					//把每一行抓出來
 					Hashtable currenttable = (Hashtable)parentTable[stringkey];
-					WeaponInfo current_weapon = new WeaponInfo();
+					EquipmentInfo current_equipment = new EquipmentInfo();
 					int count = 0;
-					current_weapon.weaponkey = stringkey;
-					weaponType weapontype = weaponType.cannotread;
+					current_equipment.equipmentkey = stringkey;
+					equipmentType equipmenttype = equipmentType.cannotread;
 					switch (currenttable [key_weapon_type].ToString()) {
 					case"weapon":
-						weapontype = weaponType.weapon;
+						equipmenttype = equipmentType.weapon;
 						break;
 					case"armor":
-						weapontype = weaponType.armor;
+						equipmenttype = equipmentType.armor;
 						break;
 					case"item":
-						weapontype = weaponType.item;
+						equipmenttype = equipmentType.item;
 						break;
 					default:
 						break;
 					}
-					current_weapon.type = weapontype;
-					current_weapon.tw = Utilities.LoadString(currenttable [key_chinese],"");
-					current_weapon.tw_desc = Utilities.LoadString(currenttable [key_chinese_desc],"");
-					current_weapon.en = Utilities.LoadString(currenttable [key_english],"");
-					current_weapon.en_desc = Utilities.LoadString(currenttable [key_english_desc],"");
-					current_weapon.effect1 = Utilities.LoadString(currenttable [key_weapon_effect1],"");
-					current_weapon.effect1_count = Utilities.LoadInt(currenttable [key_weapon_effect1count],0);
-					current_weapon.effect2 = Utilities.LoadString(currenttable [key_weapon_effect2],"");
-					current_weapon.effect2_count = Utilities.LoadInt(currenttable [key_weapon_effect2count],0);
-					current_weapon.picture_name = Utilities.LoadString(currenttable [key_picture],"");
-					current_weapon.price_value = Utilities.LoadInt(currenttable [key_value],0);
+					current_equipment.type = equipmenttype;
+					current_equipment.tw = Utilities.LoadString(currenttable [key_chinese],"");
+					current_equipment.tw_desc = Utilities.LoadString(currenttable [key_chinese_desc],"");
+					current_equipment.en = Utilities.LoadString(currenttable [key_english],"");
+					current_equipment.en_desc = Utilities.LoadString(currenttable [key_english_desc],"");
+					current_equipment.effect1 = Utilities.LoadString(currenttable [key_weapon_effect1],"");
+					current_equipment.effect1_count = Utilities.LoadInt(currenttable [key_weapon_effect1count],0);
+					current_equipment.effect2 = Utilities.LoadString(currenttable [key_weapon_effect2],"");
+					current_equipment.effect2_count = Utilities.LoadInt(currenttable [key_weapon_effect2count],0);
+					current_equipment.picture_name = Utilities.LoadString(currenttable [key_picture],"");
+					current_equipment.price_value = Utilities.LoadInt(currenttable [key_value],0);
 					career career=career.cannotread;
 					switch (currenttable [key_weapon_career].ToString()) {
 					case"all":
@@ -179,19 +178,19 @@ namespace LoadingControl{
 					default:
 						break;
 					}
-					current_weapon.usablecareer = career;
-					Utilities.DebugLog ("career is "+current_weapon.usablecareer);
-					weaponinfo_list.Add (current_weapon);
+					current_equipment.usablecareer = career;
+					Utilities.DebugLog ("career is "+current_equipment.usablecareer);
+					equipmentinfo_list.Add (current_equipment);
 				}
 			}
 		}
-		public static WeaponInfo FindWeaponInfoByKey(string weaponkey){
-			if (weaponinfo_list == null||weaponinfo_list.Count == 0)
+		public static EquipmentInfo FindWeaponInfoByKey(string equipmentkey){
+			if (equipmentinfo_list == null||equipmentinfo_list.Count == 0)
 				return null;
-			WeaponInfo rweapon = null;
-			foreach (WeaponInfo weapon in weaponinfo_list) {
-				if (weapon.weaponkey.CompareTo (weaponkey) == 0) {
-					rweapon = weapon;
+			EquipmentInfo rweapon = null;
+			foreach (EquipmentInfo equip in equipmentinfo_list) {
+				if (equip.equipmentkey.CompareTo (equipmentkey) == 0) {
+					rweapon = equip;
 					break;
 				}
 			}
@@ -237,44 +236,44 @@ namespace LoadingControl{
 	}
 }
 
-public enum weaponType{weapon,armor,item,cannotread}  //裝備類型
+public enum equipmentType{weapon,armor,item,cannotread}  //裝備類型
 public enum career{all,cannotread} //職業
 
 public class AdditionInfo{
 	public string itemkey;
 	public Dictionary<string,int> param;
 }
-public class MaterialInfo{
-	public int index;
-	public string itemkey;
-	public int count;
-	public int rate;
-	public int droprate;
-	public int price_value;
-	public string tw;
-	public string tw_desc;
-	public string en;
-	public string en_desc;
-	public string Name;
-	public int unlock_lv;
-	public bool unlocked;
-	public string picture_name;
+public class MaterialInfo{ 		//素材的數值表
+	public int index;		
+	public string itemkey;		//素材本身的key名，用這個對應
+	public int count;			//素材有幾個
+	public int rate;			//素材的稀有度
+	public int droprate;		//素材的掉寶率
+	public int price_value;		//素材的基礎價值
+	public string tw;			//素材的中文名
+	public string tw_desc;		//中文說明
+	public string en;			//英文名
+	public string en_desc;		//英文說明
+	public string Name;			//本次顯示的名稱
+	public int unlock_lv;		//解鎖等級
+	public bool unlocked;		//解鎖與否
+	public string picture_name;	//素材的圖片名
 }
-public class WeaponInfo{
-	public string weaponkey;
-	public weaponType type;
-	public int count;
-	public string tw;
-	public string tw_desc;
-	public string en;
-	public string en_desc;
-	public string effect1;
-	public int effect1_count;
-	public string effect2;
-	public int effect2_count;
-	public career usablecareer;
-	public int price_value;
-	public bool unlocked;
-	public int unlock_level;	
-	public string picture_name;
+public class EquipmentInfo{
+	public string equipmentkey;		//裝備的key名，用這個對應
+	public equipmentType type;		//裝備種類，目前有三種 武器 道具 防具
+	public int count;				//個數
+	public string tw;				//中文名
+	public string tw_desc;			//中文說明
+	public string en;				//英文名
+	public string en_desc;			//英文說明
+	public string effect1;			//效果1
+	public int effect1_count;		//效果1的數值
+	public string effect2;			//效果2
+	public int effect2_count;		//效果2的數值
+	public career usablecareer;		//可使用的職業
+	public int price_value;			//裝備基礎價值
+	public bool unlocked;			//解鎖與否
+	public int unlock_level;		//解鎖等級
+	public string picture_name;		//圖片名
 }

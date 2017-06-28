@@ -14,7 +14,7 @@ namespace LoadingControl{
 			Item.SetInitListForMaterial ();
 			Item.SetInitListForWeapon ();
 			AdditionInfo getback = Item.FindAdditionByKey (addtionfindkey);
-			WeaponInfo getback2 = Item.FindWeaponInfoByKey (weaponfindkey);
+			EquipmentInfo getback2 = Item.FindWeaponInfoByKey (weaponfindkey);
 			MaterialInfo getback3 = Item.FindMaterialByKey (materialfindkey);
 
 			Utilities.DebugLog ("addition info "+getback.itemkey );
@@ -24,7 +24,7 @@ namespace LoadingControl{
 				Utilities.DebugLog ("addition value "+param.Value );
 			}
 
-			Utilities.DebugLog ("weapon info "+getback2.weaponkey );
+			Utilities.DebugLog ("weapon info "+getback2.equipmentkey );
 
 			Utilities.DebugLog ("weapon type "+getback2.type);
 
