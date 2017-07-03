@@ -13,7 +13,7 @@ namespace LoadingControl{
 			Item.SetInitListForAddition ();
 			Item.SetInitListForMaterial ();
 			Item.SetInitListForWeapon ();
-			AdditionInfo getback = Item.FindAdditionByKey (addtionfindkey);
+			BlackSmithAddition getback = Item.FindAdditionByKey (addtionfindkey);
 			EquipmentInfo getback2 = Item.FindWeaponInfoByKey (weaponfindkey);
 			MaterialInfo getback3 = Item.FindMaterialByKey (materialfindkey);
 

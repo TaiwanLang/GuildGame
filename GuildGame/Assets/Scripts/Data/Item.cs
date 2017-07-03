@@ -45,7 +45,7 @@ namespace LoadingControl{
 
 		public static List<MaterialInfo> materialinfo_list;
 		public static List<EquipmentInfo> equipmentinfo_list;
-		public static List<AdditionInfo> additioninfo_list;
+		public static List<BlackSmithAddition> additioninfo_list;
 
 		private static Dictionary<string, object> itemTable;
 
@@ -58,7 +58,7 @@ namespace LoadingControl{
 		{
 			materialinfo_list = new List<MaterialInfo> ();
 			equipmentinfo_list = new List<EquipmentInfo> ();
-			additioninfo_list = new List<AdditionInfo> ();
+			additioninfo_list = new List<BlackSmithAddition> ();
 			itemTable = new Dictionary<string, object>();
 			itemTable = ToDictionary<string, object>((Hashtable)MiniJSON.jsonDecode(((TextAsset)Resources.Load(LANGUAGE_PATH)).text));
 		}
@@ -97,7 +97,7 @@ namespace LoadingControl{
 				foreach (string stringkey in parentTable.Keys){
 					//把每一行抓出來
 					Hashtable currenttable = (Hashtable)parentTable[stringkey];
-					AdditionInfo current_addition = new AdditionInfo();
+					BlackSmithAddition current_addition = new BlackSmithAddition();
 					current_addition.itemkey = stringkey;
 					current_addition.param = new Dictionary<string, int> ();
 					current_addition.param.Add( Utilities.LoadString(currenttable [key_addition_param1],"")
@@ -118,11 +118,11 @@ namespace LoadingControl{
 				}
 			}
 		}
-		public static AdditionInfo FindAdditionByKey(string addtionkey){
+		public static BlackSmithAddition FindAdditionByKey(string addtionkey){
 			if (additioninfo_list == null||additioninfo_list.Count == 0)
 				return null;
-			AdditionInfo raddition = null;
-			foreach (AdditionInfo addition in additioninfo_list) {
+			BlackSmithAddition raddition = null;
+			foreach (BlackSmithAddition addition in additioninfo_list) {
 				if (addition.itemkey.CompareTo (addtionkey) == 0) {
 					raddition = addition;
 					break;
@@ -234,46 +234,4 @@ namespace LoadingControl{
 		}
 
 	}
-}
-
-public enum equipmentType{weapon,armor,item,cannotread}  //裝備類型
-public enum career{all,cannotread} //職業
-
-public class AdditionInfo{
-	public string itemkey;
-	public Dictionary<string,int> param;
-}
-public class MaterialInfo{ 		//素材的數值表
-	public int index;		
-	public string itemkey;		//素材本身的key名，用這個對應
-	public int count;			//素材有幾個
-	public int rate;			//素材的稀有度
-	public int droprate;		//素材的掉寶率
-	public int price_value;		//素材的基礎價值
-	public string tw;			//素材的中文名
-	public string tw_desc;		//中文說明
-	public string en;			//英文名
-	public string en_desc;		//英文說明
-	public string Name;			//本次顯示的名稱
-	public int unlock_lv;		//解鎖等級
-	public bool unlocked;		//解鎖與否
-	public string picture_name;	//素材的圖片名
-}
-public class EquipmentInfo{
-	public string equipmentkey;		//裝備的key名，用這個對應
-	public equipmentType type;		//裝備種類，目前有三種 武器 道具 防具
-	public int count;				//個數
-	public string tw;				//中文名
-	public string tw_desc;			//中文說明
-	public string en;				//英文名
-	public string en_desc;			//英文說明
-	public string effect1;			//效果1
-	public int effect1_count;		//效果1的數值
-	public string effect2;			//效果2
-	public int effect2_count;		//效果2的數值
-	public career usablecareer;		//可使用的職業
-	public int price_value;			//裝備基礎價值
-	public bool unlocked;			//解鎖與否
-	public int unlock_level;		//解鎖等級
-	public string picture_name;		//圖片名
 }
