@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MaterialInfo{ 		//素材的數值表
+public class Material{ 		//素材的數值表
 	public int index;		
 	public string itemkey;		//素材本身的key名，用這個對應
 	public int count;			//素材有幾個
@@ -16,5 +16,5 @@ public class MaterialInfo{ 		//素材的數值表
 	public string Name;			//本次顯示的名稱
 	public int unlock_lv;		//解鎖等級
 	public bool unlocked;		//解鎖與否
-	public string picture_name;	//素材的圖片名
+	public string thumbnailpicture_name;	//素材的圖片名
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 public enum monstereffect{
 	none,//0
 	attack,//普攻100% 1
@@ -27,6 +27,30 @@ public enum monstereffect{
 	shieldofspirit,//精靈的加護  補血20% 21
 	storm//暴風  全體攻擊傷害100% 22
 }
+
+public enum MissionPointType{
+	Resource,Monster
+}
+/**
+怪物表與資源表的共用
+*/
 public class MissionPoint{
-	
+	public string key;
+	public MissionPointType type;
+	public string zh_tw;
+	public string en;
+	public int lv;
+	public int hp;
+	public int attack;
+	public int exp;
+	public Dictionary<monstereffect,int> effect;//最多三個效果，最少一個，如果是restype就無
+	public Dictionary<string,int> drop;//三種寶物掉落，最後為不掉落
+	public string animationpicturename;
+	public int animationpicturecount;
+
+	public static monstereffect Getmonstereffect(int value){
+		return (monstereffect)Enum.ToObject(typeof(monstereffect) , value);
+	}
+
+
 }

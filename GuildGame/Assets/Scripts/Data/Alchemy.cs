@@ -1,19 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class Alchemy : MonoBehaviour
+public class Alchemy
 {
-
-	// Use this for initialization
-	void Start ()
-	{
-	
-	}
-	
-	// Update is called once per frame
-	void Update ()
-	{
-	
-	}
+	public string itemkey;
+	public Dictionary<Material,int> param;
 }
 
