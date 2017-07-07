@@ -5,13 +5,13 @@ using System.Linq;
 using System.IO;
 namespace LoadingControl{
 
-	public class Item {
+	public class LoadingData {
 
-		private const string LANGUAGE_PATH = "items";
+		private const string LANGUAGE_PATH = "gamedatas";
 
-		public const string table_weapon = "weapon";
-		public const string table_material = "item";
-		public const string table_addition = "addition";
+		public const string table_equipment = "equipment";
+		public const string table_material = "material";
+		public const string table_blacksmith = "blacksmith";
 
 		public const string key = "key";
 		public const string key_chinese = "zh-tw";
@@ -21,15 +21,15 @@ namespace LoadingControl{
 		public const string key_picture = "picturename";
 		public const string key_value = "value";
 
-		//addition sheet
-		public const string key_addition_param1 = "param1";				//素材1
-		public const string key_addition_param1count = "param1count";	//素材1需要的個數
-		public const string key_addition_param2 ="param2";				//素材2
-		public const string key_addition_param2count = "param2count";	//素材2需要的個數
-		public const string key_addition_param3 = "param3";				//素材3
-		public const string key_addition_param3count = "param3count";	//素材3需要的個數
-		public const string key_addition_param4 = "param4";				//素材4
-		public const string key_addition_param4count = "param4count";	//素材4需要的個數
+		//blacksmithaddition sheet
+		public const string key_blacksmithaddition_param1 = "param1";				//素材1
+		public const string key_blacksmithaddition_param1count = "param1count";	//素材1需要的個數
+		public const string key_blacksmithaddition_param2 ="param2";				//素材2
+		public const string key_blacksmithaddition_param2count = "param2count";	//素材2需要的個數
+		public const string key_blacksmithaddition_param3 = "param3";				//素材3
+		public const string key_blacksmithaddition_param3count = "param3count";	//素材3需要的個數
+		public const string key_blacksmithaddition_param4 = "param4";				//素材4
+		public const string key_blacksmithaddition_param4count = "param4count";	//素材4需要的個數
 
 		//equipment sheet
 		public const string key_weapon_type = "type";					//裝備種類
@@ -45,7 +45,7 @@ namespace LoadingControl{
 
 		public static List<MaterialInfo> materialinfo_list;
 		public static List<EquipmentInfo> equipmentinfo_list;
-		public static List<BlackSmithAddition> additioninfo_list;
+		public static List<BlackSmithAddition> blacksmithadditioninfo_list;
 
 		private static Dictionary<string, object> itemTable;
 
@@ -58,7 +58,7 @@ namespace LoadingControl{
 		{
 			materialinfo_list = new List<MaterialInfo> ();
 			equipmentinfo_list = new List<EquipmentInfo> ();
-			additioninfo_list = new List<BlackSmithAddition> ();
+			blacksmithadditioninfo_list = new List<BlackSmithAddition> ();
 			itemTable = new Dictionary<string, object>();
 			itemTable = ToDictionary<string, object>((Hashtable)MiniJSON.jsonDecode(((TextAsset)Resources.Load(LANGUAGE_PATH)).text));
 		}
@@ -87,55 +87,56 @@ namespace LoadingControl{
 		}
 
 
-		public static void SetInitListForAddition(){
+		public static void SetInitListForBlacksmith(){
 			if (itemTable != null && itemTable.Count > 0) {
-				if (!itemTable.ContainsKey (table_addition)) {
+				if (!itemTable.ContainsKey (table_blacksmith)) {
 					return;
 				}
-				Hashtable parentTable = (Hashtable)itemTable [table_addition];
+				Hashtable parentTable = (Hashtable)itemTable [table_blacksmith];
 
 				foreach (string stringkey in parentTable.Keys){
 					//把每一行抓出來
 					Hashtable currenttable = (Hashtable)parentTable[stringkey];
-					BlackSmithAddition current_addition = new BlackSmithAddition();
-					current_addition.itemkey = stringkey;
-					current_addition.param = new Dictionary<string, int> ();
-					current_addition.param.Add( Utilities.LoadString(currenttable [key_addition_param1],"")
-						,Utilities.LoadInt(currenttable [key_addition_param1count] ,0));
-					string currentparam =  Utilities.LoadString(currenttable [key_addition_param2],"");
+					BlackSmithAddition current_blacksmithaddition = new BlackSmithAddition();
+					current_blacksmithaddition.itemkey = stringkey;
+					current_blacksmithaddition.param = new Dictionary<string, int> ();
+					current_blacksmithaddition.param.Add( Utilities.LoadString(currenttable [key_blacksmithaddition_param1],"")
+						,Utilities.LoadInt(currenttable [key_blacksmithaddition_param1count] ,0));
+					string currentparam =  Utilities.LoadString(currenttable [key_blacksmithaddition_param2],"");
 					if (currentparam != null && currentparam.CompareTo("") != 0) {
-						current_addition.param.Add(currentparam,Utilities.LoadInt(currenttable [key_addition_param2count] ,0));
+						current_blacksmithaddition.param.Add(currentparam,Utilities.LoadInt(currenttable [key_blacksmithaddition_param2count] ,0));
 					}
-					currentparam = Utilities.LoadString(currenttable [key_addition_param3],"");
+					currentparam = Utilities.LoadString(currenttable [key_blacksmithaddition_param3],"");
 					if (currentparam != null && currentparam.CompareTo("") != 0) {
-						current_addition.param.Add(currentparam,Utilities.LoadInt(currenttable [key_addition_param3count] ,0));
+						current_blacksmithaddition.param.Add(currentparam,Utilities.LoadInt(currenttable [key_blacksmithaddition_param3count] ,0));
 					}
-					currentparam = Utilities.LoadString(currenttable [key_addition_param4],"");
+					currentparam = Utilities.LoadString(currenttable [key_blacksmithaddition_param4],"");
 					if (currentparam != null && currentparam.CompareTo("") != 0) {
-						current_addition.param.Add(currentparam,Utilities.LoadInt(currenttable [key_addition_param4count] ,0));
+						current_blacksmithaddition.param.Add(currentparam,Utilities.LoadInt(currenttable [key_blacksmithaddition_param4count] ,0));
 					}
-					additioninfo_list.Add (current_addition);
+					Utilities.DebugLog ("Blacksmith now is "+stringkey);
+					blacksmithadditioninfo_list.Add (current_blacksmithaddition);
 				}
 			}
 		}
-		public static BlackSmithAddition FindAdditionByKey(string addtionkey){
-			if (additioninfo_list == null||additioninfo_list.Count == 0)
+		public static BlackSmithAddition FindBlackSmithAdditionByKey(string addtionkey){
+			if (blacksmithadditioninfo_list == null||blacksmithadditioninfo_list.Count == 0)
 				return null;
-			BlackSmithAddition raddition = null;
-			foreach (BlackSmithAddition addition in additioninfo_list) {
-				if (addition.itemkey.CompareTo (addtionkey) == 0) {
-					raddition = addition;
+			BlackSmithAddition rblacksmithaddition = null;
+			foreach (BlackSmithAddition blacksmithaddition in blacksmithadditioninfo_list) {
+				if (blacksmithaddition.itemkey.CompareTo (addtionkey) == 0) {
+					rblacksmithaddition = blacksmithaddition;
 					break;
 				}
 			}
-			return raddition;
+			return rblacksmithaddition;
 		}
-		public static void SetInitListForWeapon(){
+		public static void SetInitListForEquipment(){
 			if (itemTable != null && itemTable.Count > 0) {
-				if (!itemTable.ContainsKey (table_addition)) {
+				if (!itemTable.ContainsKey (table_equipment)) {
 					return;
 				}
-				Hashtable parentTable = (Hashtable)itemTable [table_weapon];
+				Hashtable parentTable = (Hashtable)itemTable [table_equipment];
 
 				foreach (string stringkey in parentTable.Keys){
 					//把每一行抓出來
@@ -179,12 +180,12 @@ namespace LoadingControl{
 						break;
 					}
 					current_equipment.usablecareer = career;
-					Utilities.DebugLog ("career is "+current_equipment.usablecareer);
+					Utilities.DebugLog ("Equipment now is "+stringkey);
 					equipmentinfo_list.Add (current_equipment);
 				}
 			}
 		}
-		public static EquipmentInfo FindWeaponInfoByKey(string equipmentkey){
+		public static EquipmentInfo FindEquipmentInfoByKey(string equipmentkey){
 			if (equipmentinfo_list == null||equipmentinfo_list.Count == 0)
 				return null;
 			EquipmentInfo rweapon = null;
@@ -198,7 +199,7 @@ namespace LoadingControl{
 		}
 		public static void SetInitListForMaterial(){
 			if (itemTable != null && itemTable.Count > 0) {
-				if (!itemTable.ContainsKey (table_addition)) {
+				if (!itemTable.ContainsKey (table_material)) {
 					return;
 				}
 				Hashtable parentTable = (Hashtable)itemTable [table_material];
@@ -216,6 +217,7 @@ namespace LoadingControl{
 					current_material.en_desc = Utilities.LoadString(currenttable [key_english_desc],"");
 					current_material.tw_desc = Utilities.LoadString(currenttable [key_chinese_desc],"");
 					current_material.picture_name = Utilities.LoadString(currenttable [key_picture],"");
+					Utilities.DebugLog ("material now is "+stringkey);
 					materialinfo_list.Add (current_material);
 				}
 			}

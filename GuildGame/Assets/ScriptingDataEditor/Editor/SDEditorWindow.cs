@@ -1370,7 +1370,7 @@ public class SDEditorWindow : EditorWindow
                             sheetList.Add( rowList );
                             rowMaxCell = Mathf.Max( rowMaxCell, row.LastCellNum );
 
-                            for( int w = 0; w < 6; w++ )
+							for( int w = 0; w < row.LastCellNum; w++ )
                             {
                                 ICell cell = row.GetCell(w);
                                 string value = cell == null ? "" : getCellValue( cell.CellType, cell );
