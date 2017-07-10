@@ -9,19 +9,21 @@ namespace LoadingControl{
 		private string equipmentfindkey = "bravers sword";
 		private string materialfindkey = "rags";
 		private string missionpointfindkey = "king firedragon lv40";
+
+		private string stagefindkey = "lv3 desert";
+		private string alchemyfindkey = "steel ingots";
 		// Use this for initialization
 		void Start () {
 
 			LoadingData.LoadItem ();
-			LoadingData.SetInitListForBlacksmith ();
-			LoadingData.SetInitListForMaterial ();
-			LoadingData.SetInitListForEquipment ();
-			LoadingData.SetInitListForMissionPoint ();
+
 			Utilities.DebugLog ("LoadingData.GetTabCount "+LoadingData.GetTabCount (LoadingData.table_equipment));
 			BlackSmithAddition getback = LoadingData.FindBlackSmithAdditionByKey (blacksmithfindkey);
 			Equipment getback2 = LoadingData.FindEquipmentInfoByKey (equipmentfindkey);
 			Material getback3 = LoadingData.FindMaterialByKey (materialfindkey);
 			MissionPoint missionpointback = LoadingData.FindMissionByKey (missionpointfindkey);
+			Stage stageback = LoadingData.FindStageByKey (stagefindkey);
+			Alchemy alchemyback = LoadingData.FindAlchemyByKey (alchemyfindkey);
 
 			Utilities.DebugLog ("addition info "+getback.itemkey );
 			Utilities.DebugLog ("need add "+getback.param.Count+"  item");
@@ -42,10 +44,16 @@ namespace LoadingControl{
 			Utilities.DebugLog ("weapon desc "+getback2.tw_desc );
 
 			Utilities.DebugLog ("mission point now is "+missionpointback.key);
-			Utilities.DebugLog ("mission point now is "+missionpointback.key);
-			Utilities.DebugLog ("mission point now is "+missionpointback.key);
-			Utilities.DebugLog ("mission point now is "+missionpointback.key);
-			Utilities.DebugLog ("mission point now is "+missionpointback.key);
+
+			Utilities.DebugLog ("stageback now is "+stageback.key);
+			Utilities.DebugLog ("stageback point now is "+stageback.checkpointcount);
+			Utilities.DebugLog ("stageback king is "+stageback.kingname);
+
+			Utilities.DebugLog ("alchemyback now is "+alchemyback.itemkey);
+			foreach (KeyValuePair<Material,int> param in alchemyback.param) {
+				Utilities.DebugLog ("addition key "+param.Key.tw+"  value "+param.Value );
+			}
+
 
 		}
 		

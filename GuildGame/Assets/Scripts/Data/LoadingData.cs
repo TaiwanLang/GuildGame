@@ -95,7 +95,7 @@ namespace LoadingControl{
 
 		//alchemy sheet
 		public const string key_alchemy_param1 = "param1";
-		public const string key_alchemy_pamam1count = "param1count";
+		public const string key_alchemy_param1count = "param1count";
 		public const string key_alchemy_param2 = "param2";
 		public const string key_alchemy_param2count = "param2count";
 
@@ -118,8 +118,18 @@ namespace LoadingControl{
 			materialinfo_list = new List<Material> ();
 			equipmentinfo_list = new List<Equipment> ();
 			blacksmithadditioninfo_list = new List<BlackSmithAddition> ();
+			missionpointinfo_list = new List<MissionPoint> ();
+			stageinfo_list = new List<Stage> ();
+			alchemyinfo_list = new List<Alchemy> ();
+
 			itemTable = new Dictionary<string, object>();
 			itemTable = ToDictionary<string, object>((Hashtable)MiniJSON.jsonDecode(((TextAsset)Resources.Load(LANGUAGE_PATH)).text));
+			SetInitListForBlacksmith ();
+			SetInitListForMaterial ();
+			SetInitListForEquipment ();
+			SetInitListForMissionPoint ();
+			SetInitListForStage ();
+			SetInitListForAlchemy ();
 		}
 
 		public static int GetTabCount(string parent)
@@ -299,6 +309,7 @@ namespace LoadingControl{
 
 				foreach (string stringkey in parentTable.Keys){
 					//把每一行抓出來
+					Utilities.DebugLog ("missionpoint init is "+stringkey);
 					Hashtable currenttable = (Hashtable)parentTable[stringkey];
 					MissionPoint current_missionpoint = new MissionPoint();
 					current_missionpoint.key = stringkey;
@@ -346,8 +357,9 @@ namespace LoadingControl{
 					current_missionpoint.drop = dropdata;
 					current_missionpoint.animationpicturename = Utilities.LoadString (currenttable[key_missionpoint_animationpicture]);
 					current_missionpoint.animationpicturecount = Utilities.LoadInt (currenttable [key_missionpoint_animationpictruecount]);
-					Utilities.DebugLog ("missionpoint now is "+stringkey);
+
 					missionpointinfo_list.Add (current_missionpoint);
+					Utilities.DebugLog ("missionpoint now finish add is "+stringkey);
 				}
 			}
 		}
@@ -364,83 +376,108 @@ namespace LoadingControl{
 			}
 			return rmissionpoint;
 		}
-		//TODO
+
 		public static void SetInitListForStage(){
 			if (itemTable != null && itemTable.Count > 0) {
-				if (!itemTable.ContainsKey (table_material)) {
+				if (!itemTable.ContainsKey (table_stage)) {
 					return;
 				}
-				Hashtable parentTable = (Hashtable)itemTable [table_material];
+				Hashtable parentTable = (Hashtable)itemTable [table_stage];
 
 				foreach (string stringkey in parentTable.Keys){
 					//把每一行抓出來
 					Hashtable currenttable = (Hashtable)parentTable[stringkey];
-					Material current_material = new Material();
-					current_material.itemkey = stringkey;
-					current_material.rate = Utilities.LoadInt (currenttable[key_material_rate],0);
-					current_material.droprate = Utilities.LoadInt (currenttable[key_material_droprate],0);
-					current_material.price_value = Utilities.LoadInt (currenttable[key_value],0);
-					current_material.en = Utilities.LoadString(currenttable[key_english],"");
-					current_material.tw = Utilities.LoadString(currenttable [key_chinese],"");
-					current_material.en_desc = Utilities.LoadString(currenttable [key_english_desc],"");
-					current_material.tw_desc = Utilities.LoadString(currenttable [key_chinese_desc],"");
-					current_material.thumbnailpicture_name = Utilities.LoadString(currenttable [key_material_thumbnailpicture],"");
-					Utilities.DebugLog ("material now is "+stringkey);
-					materialinfo_list.Add (current_material);
+					Stage current_stage = new Stage();
+					current_stage.key = stringkey;
+					current_stage.stagelv = Utilities.LoadInt (currenttable[key_stage_stagelevel],0);
+					current_stage.maxwarrior = Utilities.LoadInt (currenttable[key_stage_maxwarriorcount],0);
+					current_stage.maxlevel = Utilities.LoadInt (currenttable[key_stage_maxlevel],0);
+					current_stage.stage = Utilities.LoadString (currenttable[key_stage_stagename],"");
+					current_stage.checkpointcount = Utilities.LoadInt (currenttable[key_stage_checkpointcount],0);
+					current_stage.checkpointdata = new Dictionary<string, int> ();
+					current_stage.checkpointdata = CheckIfKeyGotValue (current_stage.checkpointdata, currenttable,
+						key_stage_resourcepoint1, key_stage_resourcepoint1showpercent);
+					current_stage.checkpointdata = CheckIfKeyGotValue (current_stage.checkpointdata, currenttable,
+						key_stage_resourcepoint2, key_stage_resourcepoint2showpercent);
+					current_stage.checkpointdata = CheckIfKeyGotValue (current_stage.checkpointdata, currenttable,
+						key_stage_monster1, key_stage_monster1showpercent);
+					current_stage.checkpointdata = CheckIfKeyGotValue (current_stage.checkpointdata, currenttable,
+						key_stage_monster2, key_stage_monster2showpercent);
+					current_stage.checkpointdata = CheckIfKeyGotValue (current_stage.checkpointdata, currenttable,
+						key_stage_monster3, key_stage_monster3showpercent);
+					current_stage.checkpointdata = CheckIfKeyGotValue (current_stage.checkpointdata, currenttable,
+						key_stage_monster4, key_stage_monster4showpercent);
+					
+					current_stage.kingname = Utilities.LoadString (currenttable[key_stage_kingname],"");
+					current_stage.kingpercent = Utilities.LoadInt (currenttable[key_stage_kingshowpercent],0);
+					string guildlevel = Utilities.LoadString (currenttable[key_stage_unlocklevel],"");
+					guildlevel = guildlevel.Replace ("guild lv", "");
+					current_stage.unlock_onguildlevel = Utilities.LoadInt (guildlevel,0);
+					Utilities.DebugLog ("stage now is "+stringkey);
+					stageinfo_list.Add (current_stage);
 				}
 			}
 		}
-		//TODO
-		public static Material FindStageByKey(string materialkey){
-			if (materialinfo_list == null||materialinfo_list.Count == 0)
+
+		public static Stage FindStageByKey(string stagekey){
+			if (stageinfo_list == null||stageinfo_list.Count == 0)
 				return null;
-			Material rmaterial = null;
-			foreach (Material material in materialinfo_list) {
-				if (material.itemkey.CompareTo (materialkey) == 0) {
-					rmaterial = material;
+			Stage rstage = null;
+			foreach (Stage stage in stageinfo_list) {
+				if (stage.key.CompareTo (stagekey) == 0) {
+					rstage = stage;
 					break;
 				}
 			}
-			return rmaterial;
+			return rstage;
 		}
-		//TODO
+
 		public static void SetInitListForAlchemy(){
 			if (itemTable != null && itemTable.Count > 0) {
-				if (!itemTable.ContainsKey (table_material)) {
+				if (!itemTable.ContainsKey (table_alchemy)) {
 					return;
 				}
-				Hashtable parentTable = (Hashtable)itemTable [table_material];
+				Hashtable parentTable = (Hashtable)itemTable [table_alchemy];
 
 				foreach (string stringkey in parentTable.Keys){
 					//把每一行抓出來
 					Hashtable currenttable = (Hashtable)parentTable[stringkey];
-					Material current_material = new Material();
-					current_material.itemkey = stringkey;
-					current_material.rate = Utilities.LoadInt (currenttable[key_material_rate],0);
-					current_material.droprate = Utilities.LoadInt (currenttable[key_material_droprate],0);
-					current_material.price_value = Utilities.LoadInt (currenttable[key_value],0);
-					current_material.en = Utilities.LoadString(currenttable[key_english],"");
-					current_material.tw = Utilities.LoadString(currenttable [key_chinese],"");
-					current_material.en_desc = Utilities.LoadString(currenttable [key_english_desc],"");
-					current_material.tw_desc = Utilities.LoadString(currenttable [key_chinese_desc],"");
-					current_material.thumbnailpicture_name = Utilities.LoadString(currenttable [key_material_thumbnailpicture],"");
-					Utilities.DebugLog ("material now is "+stringkey);
-					materialinfo_list.Add (current_material);
+					Alchemy current_alchemy = new Alchemy();
+					current_alchemy.itemkey = stringkey;
+					current_alchemy.param = new Dictionary<Material, int> ();
+					Material firstmaterial =  FindMaterialByKey (Utilities.LoadString(currenttable[key_alchemy_param1],""));
+					if (firstmaterial == null) {
+						Utilities.DebugLog ("alchemy can't find in material "+Utilities.LoadString(currenttable[key_alchemy_param1]));
+						return;
+					}
+					current_alchemy.param.Add (firstmaterial,Utilities.LoadInt(currenttable[key_alchemy_param1count],0));
+					string checking = Utilities.LoadString(currenttable[key_alchemy_param2],"");
+					if (checking != null && checking.CompareTo ("") != 0) {
+						Material secondmaterial =  FindMaterialByKey (Utilities.LoadString(currenttable[key_alchemy_param2],""));
+						if (secondmaterial == null) {
+							Utilities.DebugLog ("alchemy can't find in material "+Utilities.LoadString(currenttable[key_alchemy_param2]));
+							return;
+						}
+						current_alchemy.param.Add (secondmaterial,Utilities.LoadInt(currenttable[key_alchemy_param2count],0));
+					}
+
+					Utilities.DebugLog ("alchemy now is "+stringkey);
+					alchemyinfo_list.Add (current_alchemy);
 				}
 			}
 		}
-		//TODO
-		public static Material FindAlchemyByKey(string materialkey){
-			if (materialinfo_list == null||materialinfo_list.Count == 0)
+
+		public static Alchemy FindAlchemyByKey(string alchemykey){
+			if (alchemyinfo_list == null||alchemyinfo_list.Count == 0)
 				return null;
-			Material rmaterial = null;
-			foreach (Material material in materialinfo_list) {
-				if (material.itemkey.CompareTo (materialkey) == 0) {
-					rmaterial = material;
+			Alchemy ralchemy = null;
+			foreach (Alchemy alchemy in alchemyinfo_list) {
+				if (alchemy.itemkey.CompareTo (alchemykey) == 0) {
+					ralchemy = alchemy;
 					break;
 				}
 			}
-			return rmaterial;
+			return ralchemy;
 		}
 
 		private static Dictionary<string,int> CheckIfKeyGotValue(Dictionary<string,int> dic,Hashtable table,string checkstring,string checkcount){
