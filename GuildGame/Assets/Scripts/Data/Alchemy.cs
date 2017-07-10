@@ -7,4 +7,3 @@ public class Alchemy
 	public string itemkey;
 	public Dictionary<Material,int> param;
 }
-

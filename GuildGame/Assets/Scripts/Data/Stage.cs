@@ -9,9 +9,11 @@ public class Stage
 	public int maxwarrior;
 	public int maxlevel;
 	public string stage;
+	public int checkpointcount;
 	public Dictionary<string,int> checkpointdata;
 	public string kingname;
 	public int kingpercent;
-	public bool unlock;
+	public int unlock_onguildlevel;
+	public bool unlocked;
 }
 
