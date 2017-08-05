@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using NicePlay;
 namespace LoadingControl{
 
 	public class GameControl : MonoBehaviour {
@@ -20,7 +21,7 @@ namespace LoadingControl{
 			Utilities.DebugLog ("LoadingData.GetTabCount "+LoadingData.GetTabCount (LoadingData.table_equipment));
 			BlackSmithAddition getback = LoadingData.FindBlackSmithAdditionByKey (blacksmithfindkey);
 			Equipment getback2 = LoadingData.FindEquipmentInfoByKey (equipmentfindkey);
-			Material getback3 = LoadingData.FindMaterialByKey (materialfindkey);
+			GameMaterial getback3 = LoadingData.FindMaterialByKey (materialfindkey);
 			MissionPoint missionpointback = LoadingData.FindMissionByKey (missionpointfindkey);
 			Stage stageback = LoadingData.FindStageByKey (stagefindkey);
 			Alchemy alchemyback = LoadingData.FindAlchemyByKey (alchemyfindkey);
@@ -50,7 +51,7 @@ namespace LoadingControl{
 			Utilities.DebugLog ("stageback king is "+stageback.kingname);
 
 			Utilities.DebugLog ("alchemyback now is "+alchemyback.itemkey);
-			foreach (KeyValuePair<Material,int> param in alchemyback.param) {
+			foreach (KeyValuePair<GameMaterial,int> param in alchemyback.param) {
 				Utilities.DebugLog ("addition key "+param.Key.tw+"  value "+param.Value );
 			}
 

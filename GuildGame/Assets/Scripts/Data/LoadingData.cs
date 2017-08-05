@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.IO;
+using NicePlay;
 namespace LoadingControl{
 
 	public class LoadingData {
@@ -99,7 +100,7 @@ namespace LoadingControl{
 		public const string key_alchemy_param2 = "param2";
 		public const string key_alchemy_param2count = "param2count";
 
-		public static List<Material> materialinfo_list;
+		public static List<GameMaterial> materialinfo_list;
 		public static List<Equipment> equipmentinfo_list;
 		public static List<BlackSmithAddition> blacksmithadditioninfo_list;
 		public static List<Alchemy> alchemyinfo_list;
@@ -115,7 +116,7 @@ namespace LoadingControl{
 
 		public static void LoadItem()
 		{
-			materialinfo_list = new List<Material> ();
+			materialinfo_list = new List<GameMaterial> ();
 			equipmentinfo_list = new List<Equipment> ();
 			blacksmithadditioninfo_list = new List<BlackSmithAddition> ();
 			missionpointinfo_list = new List<MissionPoint> ();
@@ -272,7 +273,7 @@ namespace LoadingControl{
 				foreach (string stringkey in parentTable.Keys){
 					//把每一行抓出來
 					Hashtable currenttable = (Hashtable)parentTable[stringkey];
-					Material current_material = new Material();
+					GameMaterial current_material = new GameMaterial();
 					current_material.itemkey = stringkey;
 					current_material.rate = Utilities.LoadInt (currenttable[key_material_rate],0);
 					current_material.droprate = Utilities.LoadInt (currenttable[key_material_droprate],0);
@@ -287,11 +288,11 @@ namespace LoadingControl{
 				}
 			}
 		}
-		public static Material FindMaterialByKey(string materialkey){
+		public static GameMaterial FindMaterialByKey(string materialkey){
 			if (materialinfo_list == null||materialinfo_list.Count == 0)
 				return null;
-			Material rmaterial = null;
-			foreach (Material material in materialinfo_list) {
+			GameMaterial rmaterial = null;
+			foreach (GameMaterial material in materialinfo_list) {
 				if (material.itemkey.CompareTo (materialkey) == 0) {
 					rmaterial = material;
 					break;
@@ -444,8 +445,8 @@ namespace LoadingControl{
 					Hashtable currenttable = (Hashtable)parentTable[stringkey];
 					Alchemy current_alchemy = new Alchemy();
 					current_alchemy.itemkey = stringkey;
-					current_alchemy.param = new Dictionary<Material, int> ();
-					Material firstmaterial =  FindMaterialByKey (Utilities.LoadString(currenttable[key_alchemy_param1],""));
+					current_alchemy.param = new Dictionary<GameMaterial, int> ();
+					GameMaterial firstmaterial =  FindMaterialByKey (Utilities.LoadString(currenttable[key_alchemy_param1],""));
 					if (firstmaterial == null) {
 						Utilities.DebugLog ("alchemy can't find in material "+Utilities.LoadString(currenttable[key_alchemy_param1]));
 						return;
@@ -453,7 +454,7 @@ namespace LoadingControl{
 					current_alchemy.param.Add (firstmaterial,Utilities.LoadInt(currenttable[key_alchemy_param1count],0));
 					string checking = Utilities.LoadString(currenttable[key_alchemy_param2],"");
 					if (checking != null && checking.CompareTo ("") != 0) {
-						Material secondmaterial =  FindMaterialByKey (Utilities.LoadString(currenttable[key_alchemy_param2],""));
+						GameMaterial secondmaterial =  FindMaterialByKey (Utilities.LoadString(currenttable[key_alchemy_param2],""));
 						if (secondmaterial == null) {
 							Utilities.DebugLog ("alchemy can't find in material "+Utilities.LoadString(currenttable[key_alchemy_param2]));
 							return;

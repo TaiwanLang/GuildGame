@@ -3,7 +3,8 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-namespace LoadingControl{
+using LoadingControl;
+namespace NicePlay{
 
 	public class Utilities {
 
