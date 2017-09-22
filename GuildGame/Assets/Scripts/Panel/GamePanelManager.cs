@@ -66,6 +66,10 @@ public class GamePanelManager : MonoBehaviour {
 	{
 		get { return m_CurrentPanel; }
 	}
+	public GamePanelInfo PreviousPanel
+	{
+		get { return m_PreviousPanel; }
+	}
 	private bool m_IsTransition = false;
 	public bool inTransition{get{return m_IsTransition;}}
 
@@ -162,6 +166,17 @@ public class GamePanelManager : MonoBehaviour {
 		}
 	}
 
+	public void PlayPreviousPanel()
+	{
+		Play(m_PreviousPanel);
+	}
+
+	public void PlayBackOut(string title, string msg)
+	{
+		SetTransition(false);
+		PlayMessage(title, msg, PlayPreviousPanel);
+	}
+
 	public void PlayMessage(string title, string msg, params UnityAction[] actions)
 	{
 		if(message_Panel == null)
@@ -187,8 +202,14 @@ public class GamePanelManager : MonoBehaviour {
 				}
 				else
 				{
-					message_Panel.Depth = m_PopupPanelList[m_PopupPanelList.Count-1].Depth + 4;
+					message_Panel.Depth = m_PopupPanelList[m_PopupPanelList.Count-1].Depth + 6;
 				}
+
+				for(int i = 0; i < message_Panel.childPanels.Length; i++)
+				{
+					message_Panel.childPanels[i].panel.depth = message_Panel.Depth + message_Panel.childPanels[i].depth;
+				}
+
 				m_PopupPanelList.Add(message_Panel);
 			}
 			message_Panel.SetMessage(title, msg, actions);
@@ -217,8 +238,14 @@ public class GamePanelManager : MonoBehaviour {
 					}
 					else
 					{
-						panel.Depth = m_PopupPanelList[m_PopupPanelList.Count-1].Depth + 4;
+						panel.Depth = m_PopupPanelList[m_PopupPanelList.Count-1].Depth + 6;
 					}
+
+					for(int i = 0; i < panel.childPanels.Length; i++)
+					{
+						panel.childPanels[i].panel.depth = panel.Depth + panel.childPanels[i].depth;
+					}
+
 					m_PopupPanelList.Add(panel);
 				}
 				panel.Initialize(()=> SetTransition(false));
@@ -245,6 +272,18 @@ public class GamePanelManager : MonoBehaviour {
 				if(m_PopupPanelList.Contains(panel))
 				{
 					m_PopupPanelList.Remove(panel);
+				}
+
+				if(m_PopupPanelList.Count > 0)
+				{
+					m_PopupPanelList[m_PopupPanelList.Count-1].OnFocused();
+				}
+				else
+				{
+					foreach(PanelType key in m_CurrentPanel.panels.Keys)
+					{
+						m_CurrentPanel.panels[key].OnFocused();
+					}
 				}
 			}
 		}

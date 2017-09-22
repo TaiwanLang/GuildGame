@@ -5,16 +5,32 @@ using UnityEngine.Events;
 
 public class GamePanel : MonoBehaviour
 {
+    [System.Serializable]
+    public class ChildPanel
+    {
+        public UIPanel panel;
+        public int depth;
+
+        public ChildPanel(UIPanel _panel, int _depth)
+        {
+            panel = _panel;
+            depth = _depth;
+        }
+    }
 
     public PanelType type;
-    public Animation panelAnimation;
-
-    public string inAnimationName;
-    public string outAnimationName;
-    public string resetAnimation;
 
     [HideInInspector]
-    public bool IsIn = false;
+    public Animation panelAnimation;
+
+    [HideInInspector]
+    public AnimationClip[] animationClips;
+
+    [HideInInspector]
+    public ChildPanel[] childPanels;
+
+    [HideInInspector]
+    public bool IsIn = false, hasChildPanel = false;
 
     private UnityAction m_Action;
 
@@ -25,6 +41,7 @@ public class GamePanel : MonoBehaviour
     protected virtual void OnOut() { }
     public virtual void OnChanged() { }
     public virtual void OnUpdated() { }
+    public virtual void OnFocused() { }
 
     public int Depth
     {
@@ -38,6 +55,10 @@ public class GamePanel : MonoBehaviour
         {
             panelAnimation = GetComponent<Animation>();
             NicePlay.Utilities.DebugLog("Animation>() != null");
+        }
+        else if(transform.Find("Animation") != null && transform.Find("Animation").gameObject.GetComponent<Animation>() != null)
+        {
+            panelAnimation = transform.Find("Animation").gameObject.GetComponent<Animation>();
         }
 
         if (GetComponent<UIPanel>() != null)
@@ -56,10 +77,10 @@ public class GamePanel : MonoBehaviour
             m_UIPanel.depth = Depth;
         }
 
-        if (panelAnimation != null && !string.IsNullOrEmpty(resetAnimation))
+        if (panelAnimation != null && CheckAnimationClip(2))
         {
         	gameObject.SetActive(true);
-          	PlayAnimation(resetAnimation);
+          	PlayAnimation(animationClips[2].name);
             NicePlay.Utilities.DebugLog("panelAnimation != null && !string.IsNullOrEmpty(resetAnimation)");
         }
 
@@ -71,28 +92,41 @@ public class GamePanel : MonoBehaviour
         }
     }
 
+    private bool CheckAnimationClip(int index)
+    {
+        return animationClips != null && animationClips.Length >= index + 1 && animationClips[index] != null;
+    }
+
     public virtual void In(UnityAction action = null)
     {
-    	if(panelAnimation != null && !string.IsNullOrEmpty(inAnimationName))
+    	if(panelAnimation != null && CheckAnimationClip(0))
     	{
-    		PlayAnimation(inAnimationName, false, action);
+    		PlayAnimation(animationClips[0].name, false, action);
     	}
         else
         {
-        	action();
+            if(action != null)
+            {
+                action();
+            }
+        	
         	StartCoroutine(Delay(0.1f, OnIn));
         }
     }
 
     public virtual void Out(UnityAction action = null)
     {
-    	if(panelAnimation != null && !string.IsNullOrEmpty(outAnimationName))
+    	if(panelAnimation != null && CheckAnimationClip(1))
     	{
-    		PlayAnimation(outAnimationName, true, action);
+    		PlayAnimation(animationClips[1].name, true, action);
     	}
         else
         {
-        	action();
+            if(action != null)
+            {
+                action();
+            }
+        	
         	StartCoroutine(Delay(0.1f, ()=>OnOutAnimation(null)));
         }
     }
@@ -100,7 +134,7 @@ public class GamePanel : MonoBehaviour
     private void PlayAnimation(string animationName, bool isOut, UnityAction action = null)
     {
         m_Action = action;
-        if (panelAnimation != null && !string.IsNullOrEmpty(animationName))
+        if (panelAnimation != null)
         {
             ActiveAnimation activeAnimation = ActiveAnimation.Play(panelAnimation, animationName, AnimationOrTween.Direction.Forward);
             if (!isOut)
@@ -175,6 +209,14 @@ public class GamePanel : MonoBehaviour
         if (m_Action != null)
         {
             m_Action();
+        }
+    }
+
+    protected void ClosePopup()
+    {
+        if(type == PanelType.Popup)
+        {
+            GamePanelManager.Instance.ClosePopup(this);
         }
     }
 }

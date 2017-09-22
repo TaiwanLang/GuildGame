@@ -8,6 +8,10 @@ public class RootControl : MonoBehaviour {
 	public bool MainSceneActive;
 	public GameObject backswitch;
 	public GameObject ToFight;
+
+	public GameObject Obj_BlackSmith;
+
+
 	private Dictionary<int,GameObject> fightpeople_dic;
 	private Dictionary<int,GameObject> monster_dic;
 
@@ -27,6 +31,11 @@ public class RootControl : MonoBehaviour {
 		people.SetActive (true);
 		UIEventListener.Get (backswitch).onClick += BackToMain;
 		UIEventListener.Get (ToFight).onClick += GoToFight;
+		UIEventListener.Get (Obj_BlackSmith).onClick += BlackSmithView;
+	}
+	private void BlackSmithView(GameObject Blacksmithclicked){
+		Debug.Log ("black smith view on");
+
 	}
 	private void BackToMain(GameObject game){
 		print ("back to main");
